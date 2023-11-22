@@ -3,6 +3,7 @@ local M = {}
 local ui = require("cellular-automaton.ui")
 local common = require("cellular-automaton.common")
 local animation_in_progress = false
+local wrap_prev = nil -- store user's wrap settings before execution
 
 local function process_frame(grid, animation_config, win_id)
   -- quit if animation already interrupted
@@ -65,6 +66,8 @@ end
 
 M.execute_animation = function(animation_config)
   local ok, err = pcall(_execute_animation, animation_config)
+  wrap_prev = vim.o.wrap
+  vim.o.wrap = false
   if not ok then
     M.clean()
     error(err)
@@ -74,6 +77,7 @@ end
 M.clean = function()
   animation_in_progress = false
   ui.clean()
+  vim.o.wrap = wrap_prev
 end
 
 return M
